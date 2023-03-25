@@ -2,15 +2,34 @@
 import math
 import sys
 
+def is_prime(num):
+    """
+    Given a natural number num, return True if it is prime, and False otherwise.
+    """
+    if num <= 1:
+        return False
+    elif num <= 3:
+        return True
+    elif num % 2 == 0 or num % 3 == 0:
+        return False
+    else:
+        for i in range(5, int(math.sqrt(num))+1, 6):
+            if num % i == 0 or num % (i+2) == 0:
+                return False
+        return True
+
 def factorize(num):
     """
-    Given a natural number num, return a tuple (p, q) such that p*q=num and p<=q.
-    If no such tuple exists, return None.
+    Given a prime natural number num, print its prime factorization.
     """
-    for p in range(2, int(math.sqrt(num))+1):
-        if num % p == 0:
-            return (p, num // p)
-    return None
+    factors = []
+    for i in range(2, int(math.sqrt(num))+1):
+        while num % i == 0:
+            factors.append(i)
+            num //= i
+    if num > 1:
+        factors.append(num)
+    print(f"{num}={'*'.join(map(str, factors))}")
 
 if __name__ == "__main__":
     if len(sys.argv) != 2:
@@ -23,13 +42,5 @@ if __name__ == "__main__":
         for line in f:
             num = int(line.strip())
 
-            if factorize(num) is None:
-                print(f"{num} is prime")
-            else:
-                while True:
-                    factors = factorize(num)
-                    if factors:
-                        break
-                    num += 1
-
-                print(f"{num}={factors[0]}*{factors[1]}")
+            if is_prime(num):
+                factorize(num)
