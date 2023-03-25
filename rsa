@@ -1,46 +1,42 @@
 #!/usr/bin/python3
 import math
-import sys
+import random
 
-def is_prime(num):
+def gcd(a, b):
     """
-    Given a natural number num, return True if it is prime, and False otherwise.
+    Given two integers a and b, return their greatest common divisor (GCD).
+    """
+    if b == 0:
+        return a
+    else:
+        return gcd(b, a % b)
+
+def pollard_rho(num):
+    """
+    Given a prime natural number num, return its prime factorization.
     """
     if num <= 1:
-        return False
-    elif num <= 3:
-        return True
-    elif num % 2 == 0 or num % 3 == 0:
-        return False
+        return []
+    elif num % 2 == 0:
+        return [2] + pollard_rho(num // 2)
     else:
-        for i in range(5, int(math.sqrt(num))+1, 6):
-            if num % i == 0 or num % (i+2) == 0:
-                return False
-        return True
+        x = random.randint(1, num-1)
+        y = x
+        c = random.randint(1, num-1)
+        d = 1
 
-def factorize(num):
-    """
-    Given a prime natural number num, print its prime factorization.
-    """
-    factors = []
-    for i in range(2, int(math.sqrt(num))+1):
-        while num % i == 0:
-            factors.append(i)
-            num //= i
-    if num > 1:
-        factors.append(num)
-    print(f"{num}={'*'.join(map(str, factors))}")
+        while d == 1:
+            x = (x**2 + c) % num
+            y = (y**2 + c) % num
+            y = (y**2 + c) % num
+            d = gcd(abs(x - y), num)
+
+            if d == num:
+                return pollard_rho(num)
+
+        return pollard_rho(d) + pollard_rho(num // d)
 
 if __name__ == "__main__":
-    if len(sys.argv) != 2:
-        print("Usage: factors <file>")
-        sys.exit(1)
-
-    filename = sys.argv[1]
-
-    with open(filename, "r") as f:
-        for line in f:
-            num = int(line.strip())
-
-            if is_prime(num):
-                factorize(num)
+    num = 239809320265259
+    factors = pollard_rho(num)
+    print(f"{num} = {'*'.join(map(str, factors))}")
